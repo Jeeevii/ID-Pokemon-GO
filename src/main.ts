@@ -58,6 +58,10 @@ const cacheMap: Map<Cell, [leaflet.Layer, boolean]> = new Map<
 >();
 let movements: leaflet.LatLng[] = [];
 let polylineArray: leaflet.Polyline[] = [];
+const south = document.getElementById("south");
+const north = document.getElementById("north");
+const east = document.getElementById("east");
+const west = document.getElementById("west");
 const liveSensor = document.getElementById("sensor");
 const reset = document.getElementById("reset");
 
@@ -65,7 +69,7 @@ currentMap.getGridCell(MERRILL_CLASSROOM.lat, MERRILL_CLASSROOM.lng);
 const playerMarker = leaflet.marker(MERRILL_CLASSROOM);
 
 movements.push(playerMarker.getLatLng());
-const playerPath = polyline(movements, { color: `blue` });
+let playerPath = polyline(movements, { color: `blue` });
 polylineArray.push(playerPath);
 
 playerMarker.bindTooltip("That's you!");
@@ -278,7 +282,98 @@ liveSensor?.addEventListener("click", () => {
     },
     { maximumAge: 10000, timeout: 5000, enableHighAccuracy: true };
 });
+south?.addEventListener("click", () => {
+  playerMarker.setLatLng({
+    lat: playerMarker.getLatLng().lat - 0.0001,
+    lng: playerMarker.getLatLng().lng,
+  });
+  map.setView(playerMarker.getLatLng());
+  movements.push(playerMarker.getLatLng());
+  playerPath = polyline(movements, { color: `blue` }).addTo(map);
+  polylineArray.push(playerPath);
+  pitSpawn();
+  updateMap();
+});
 
+north?.addEventListener("click", () => {
+  playerMarker.setLatLng({
+    lat: playerMarker.getLatLng().lat + 0.0001,
+    lng: playerMarker.getLatLng().lng,
+  });
+  map.setView(playerMarker.getLatLng());
+  movements.push(playerMarker.getLatLng());
+  playerPath = polyline(movements, { color: `blue` }).addTo(map);
+  polylineArray.push(playerPath);
+  pitSpawn();
+  updateMap();
+});
+
+east?.addEventListener("click", () => {
+  playerMarker.setLatLng({
+    lat: playerMarker.getLatLng().lat,
+    lng: playerMarker.getLatLng().lng + 0.0001,
+  });
+  map.setView(playerMarker.getLatLng());
+  movements.push(playerMarker.getLatLng());
+  playerPath = polyline(movements, { color: `blue` }).addTo(map);
+  polylineArray.push(playerPath);
+  pitSpawn();
+  updateMap();
+});
+
+west?.addEventListener("click", () => {
+  playerMarker.setLatLng({
+    lat: playerMarker.getLatLng().lat,
+    lng: playerMarker.getLatLng().lng - 0.0001,
+  });
+  map.setView(playerMarker.getLatLng());
+  movements.push(playerMarker.getLatLng());
+  playerPath = polyline(movements, { color: `blue` }).addTo(map);
+  polylineArray.push(playerPath);
+  pitSpawn();
+  updateMap();
+});
+
+liveSensor?.addEventListener("click", () => {
+  navigator.geolocation.watchPosition((position) => {
+    playerMarker.setLatLng(
+      leaflet.latLng(position.coords.latitude, position.coords.longitude)
+    );
+    map.setView(playerMarker.getLatLng());
+    movements.push(playerMarker.getLatLng());
+    playerPath = polyline(movements, { color: `red` }).addTo(map);
+    polylineArray.push(playerPath);
+
+    pitSpawn();
+    updateMap();
+  }),
+    function error() {
+      alert(`Please enable your GPS position feature.`);
+    },
+    { maximumAge: 10000, timeout: 5000, enableHighAccuracy: true };
+});
+
+reset?.addEventListener("click", () => {
+  movements = [];
+  polylineArray.forEach((line) => {
+    line.remove();
+  });
+  polylineArray = [];
+  playerMarker.setLatLng(MERRILL_CLASSROOM);
+  map.setView(playerMarker.getLatLng());
+  currentMap.clearBoard();
+  cacheList.clear();
+  cacheMap.forEach((cache) => {
+    cache[0].remove();
+  });
+  cacheMap.clear();
+  localStorage.clear();
+  clearedLocations.clear();
+  pitSpawn();
+  localStorage.setItem("player", ``);
+  playerCoins = [];
+  statusPanel.innerHTML = "No points yet...";
+});
 reset?.addEventListener("click", () => {
   //return back to spawn
   movements = [];
@@ -299,5 +394,4 @@ reset?.addEventListener("click", () => {
   pitSpawn();
   localStorage.setItem("player", ``);
   playerCoins = [];
-  statusPanel.innerHTML = "No points yet..."; //reset the points
 });
