@@ -69,7 +69,7 @@ currentMap.getGridCell(MERRILL_CLASSROOM.lat, MERRILL_CLASSROOM.lng);
 const playerMarker = leaflet.marker(MERRILL_CLASSROOM);
 
 movements.push(playerMarker.getLatLng());
-let playerPath = polyline(movements, { color: `blue` });
+let playerPath = polyline(movements, { color: `red` });
 polylineArray.push(playerPath);
 
 playerMarker.bindTooltip("That's you!");
@@ -194,7 +194,7 @@ function messageChange(value: number, list: string[]) {
   let content = ``;
   for (let iter = 0; iter < value; iter++) {
     if (list) {
-      content += `<p>${list[iter]}   <button id="collect">collect</button></p>`;
+      content += `<p>${list[iter]}   <button id="collect">Grab</button></p>`;
     }
   }
   if (temp) {
@@ -208,8 +208,6 @@ function pitSpawn() {
       const lat = playerMarker.getLatLng().lat + i * TILE_DEGREES;
       const lng = playerMarker.getLatLng().lng + j * TILE_DEGREES;
       const key = `${lat.toFixed(5)}_${lng.toFixed(5)}`;
-      //clearedLocations.add(key);
-
       if (
         Math.random() * 100 <= PIT_SPAWN_PROBABILITY &&
         !clearedLocations.has(key)
@@ -225,46 +223,27 @@ function pitSpawn() {
 pitSpawn();
 
 function updateMap() {
-  //console.log("Updating map...");
-
   const playerCell: Cell = currentMap.getGridCell(
     playerMarker.getLatLng().lat,
     playerMarker.getLatLng().lng
   );
-
-  //console.log("Player Cell:", playerCell);
-
   cacheMap.forEach((cache, cell) => {
-    //console.log("Cache Cell:", cell);
-
     const distanceX = Math.abs(cell.x - playerCell.x);
     const distanceY = Math.abs(cell.y - playerCell.y);
-
-    //console.log("Distance X:", distanceX);
-    //console.log("Distance Y:", distanceY);
-
     const inRangeX = distanceX <= NEIGHBORHOOD_SIZE;
     const inRangeY = distanceY <= NEIGHBORHOOD_SIZE;
-
-    //console.log("In Range X:", inRangeX);
-    //console.log("In Range Y:", inRangeY);
-
     if (!inRangeX || !inRangeY) {
-      // If outside the NEIGHBORHOOD_SIZE in either X or Y direction, remove it
       if (cache[1]) {
         cache[0].remove();
         cache[1] = false;
       }
     } else {
-      // If inside the NEIGHBORHOOD_SIZE, add it if it's not already added
       if (!cache[1]) {
         cache[0].addTo(map);
         cache[1] = true;
       }
     }
   });
-
-  //console.log("Map updated!");
 }
 
 liveSensor?.addEventListener("click", () => {
@@ -289,7 +268,7 @@ south?.addEventListener("click", () => {
   });
   map.setView(playerMarker.getLatLng());
   movements.push(playerMarker.getLatLng());
-  playerPath = polyline(movements, { color: `blue` }).addTo(map);
+  playerPath = polyline(movements, { color: `red` }).addTo(map);
   polylineArray.push(playerPath);
   pitSpawn();
   updateMap();
@@ -302,7 +281,7 @@ north?.addEventListener("click", () => {
   });
   map.setView(playerMarker.getLatLng());
   movements.push(playerMarker.getLatLng());
-  playerPath = polyline(movements, { color: `blue` }).addTo(map);
+  playerPath = polyline(movements, { color: `red` }).addTo(map);
   polylineArray.push(playerPath);
   pitSpawn();
   updateMap();
@@ -315,7 +294,7 @@ east?.addEventListener("click", () => {
   });
   map.setView(playerMarker.getLatLng());
   movements.push(playerMarker.getLatLng());
-  playerPath = polyline(movements, { color: `blue` }).addTo(map);
+  playerPath = polyline(movements, { color: `red` }).addTo(map);
   polylineArray.push(playerPath);
   pitSpawn();
   updateMap();
@@ -328,7 +307,7 @@ west?.addEventListener("click", () => {
   });
   map.setView(playerMarker.getLatLng());
   movements.push(playerMarker.getLatLng());
-  playerPath = polyline(movements, { color: `blue` }).addTo(map);
+  playerPath = polyline(movements, { color: `red` }).addTo(map);
   polylineArray.push(playerPath);
   pitSpawn();
   updateMap();
@@ -341,7 +320,7 @@ liveSensor?.addEventListener("click", () => {
     );
     map.setView(playerMarker.getLatLng());
     movements.push(playerMarker.getLatLng());
-    playerPath = polyline(movements, { color: `red` }).addTo(map);
+    playerPath = polyline(movements, { color: `blue` }).addTo(map);
     polylineArray.push(playerPath);
 
     pitSpawn();
